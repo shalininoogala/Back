@@ -1,15 +1,12 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
-
 import os
-
-
 
 #to avoid this error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized. 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 #for LLM 
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = "API KEY"
  
 from langchain_groq import ChatGroq
  
@@ -20,26 +17,17 @@ from langchain_core.messages import HumanMessage
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
- 
 store = {}
-
-
-
 
 #initialize the app
 app = FastAPI()
 
 
-
-
-
 # Now on to making a llama3 API
-
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
-
 
 with_message_history = RunnableWithMessageHistory(llmModel, get_session_history)
 
