@@ -1,7 +1,7 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
-import os
 
+import os
 #to avoid this error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized. 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
@@ -17,17 +17,22 @@ from langchain_core.messages import HumanMessage
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+ 
 store = {}
+
+
+
 
 #initialize the app
 app = FastAPI()
 
-
 # Now on to making a llama3 API
+
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
+
 
 with_message_history = RunnableWithMessageHistory(llmModel, get_session_history)
 
@@ -61,9 +66,12 @@ class sessionInfo(BaseModel):
 @app.post("/deleteChat")
 async def deleteChat(sid:sessionInfo):
     # Deleting Chat by it's session id
+    response="session id not found"
     session_id=sid.session_id
     if session_id in store:
         del store[session_id]
+        response="success"
+    return response
 
 
 
