@@ -1,8 +1,7 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 
-import os
-#to avoid this error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized. 
+import os 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 #for LLM 
@@ -13,15 +12,11 @@ from langchain_groq import ChatGroq
 llmModel = ChatGroq(model="llama3-8b-8192")
  
 from langchain_core.messages import HumanMessage
- 
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
  
 store = {}
-
-
-
 
 #initialize the app
 app = FastAPI()
@@ -33,12 +28,10 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
 
-
 with_message_history = RunnableWithMessageHistory(llmModel, get_session_history)
 
-
-
 #Request body of caBuddy enpoint message ie the user prompt and session_id of a particular session
+
 class Message(BaseModel):
     message: str
     session_id:str
@@ -58,8 +51,8 @@ async def llmResponse(msg: Message):
     )
     return response.content
 
-
 #declaring the session_id parameter required by deleteChat API enpoint
+
 class sessionInfo(BaseModel):
     session_id:str
 
@@ -72,10 +65,6 @@ async def deleteChat(sid:sessionInfo):
         del store[session_id]
         response="success"
     return response
-
-
-
-
 
 if __name__ == "__main__":
     import uvicorn 
